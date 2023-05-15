@@ -16,13 +16,13 @@ import { useState } from "react";
 //   textArea.style.height = `${textArea.scrollHeight}px`;
 // }
 
-const NewTweetForm = ({}) => {
+const NewTweetForm = () => {
   const [inputValue, setInputValue] = useState("");
   const session = useSession();
 
-  if (session.status !== "authenticated") {
-    return;
-  }
+  //   if (session.status !== "authenticated") {
+  //     return;
+  //   }
 
   return (
     <form className=" flex flex-col gap-2 border-b px-4 py-2">
