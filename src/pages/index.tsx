@@ -1,4 +1,6 @@
-import NewTweetForm from "@/components/NewTweetForm";
+import InfiniteTweetList from "@/components/InfiniteTweetList";
+import NewTweetForm from "@/components/NewTwiitForm";
+import { api } from "@/utils/api";
 import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 
@@ -15,8 +17,25 @@ const Home: NextPage = () => {
           <NewTweetForm />
         </div>
       )}
+      <RecentTwiits />
     </>
   );
 };
+
+function RecentTwiits() {
+  const twiits = api.twiit.infiniteFeed.useInfiniteQuery(
+    {},
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
+  return (
+    <InfiniteTweetList
+      twiits={twiits?.data?.pages.flatMap((page) => page.twiits)}
+      isError={twiits.isError}
+      isLoading={twiits.isLoading}
+      hasMore={twiits?.hasNextPage}
+      fetchNewTwiits={twiits.fetchNextPage}
+    />
+  );
+}
 
 export default Home;

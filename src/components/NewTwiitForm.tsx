@@ -1,7 +1,14 @@
 import { useSession } from "next-auth/react";
 import ProfileImage from "./ProfileImage";
 import Button from "./Button";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { api } from "@/utils/api";
 
 // update textarea height
 
@@ -28,8 +35,22 @@ const Form = () => {
     updateTextAreaHeight(textAreaRef.current);
   }, [inputValue]);
 
+  const createTwiit = api.twiit.create.useMutation({
+    // onSuccess: (newTwiit) => {
+    //   setInputValue("");
+    // },
+  });
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    createTwiit.mutate({ content: inputValue });
+  }
+
   return (
-    <form className=" flex flex-col gap-2 border-b px-4 py-2">
+    <form
+      onSubmit={handleSubmit}
+      className=" flex flex-col gap-2 border-b px-4 py-2"
+    >
       <div className=" flex gap-4">
         <ProfileImage src={session.data?.user.image || ""} className="" />
         <textarea
