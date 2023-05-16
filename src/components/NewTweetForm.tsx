@@ -1,34 +1,39 @@
 import { useSession } from "next-auth/react";
 import ProfileImage from "./ProfileImage";
 import Button from "./Button";
-import { useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 // update textarea height
 
-// todo: continue from here
+function updateTextAreaHeight(textArea?: HTMLTextAreaElement) {
+  if (!textArea) {
+    return;
+  }
 
-// function updateTextAreaHeight(textArea?: HTMLTextAreaElement) {
-//   if (!textArea) {
-//     return;
-//   }
+  textArea.style.height = "0px";
+  textArea.style.height = `${textArea.scrollHeight}px`;
+}
 
-//   textArea.style.height = "0px";
-//   textArea.style.height = `${textArea.scrollHeight}px`;
-// }
-
-const NewTweetForm = () => {
+const Form = () => {
   const [inputValue, setInputValue] = useState("");
   const session = useSession();
+  const textAreaRef = useRef<HTMLTextAreaElement>();
 
-  //   if (session.status !== "authenticated") {
-  //     return;
-  //   }
+  const inputRef = useCallback((textArea: HTMLTextAreaElement) => {
+    updateTextAreaHeight(textArea);
+    textAreaRef.current = textArea;
+  }, []);
+
+  useLayoutEffect(() => {
+    updateTextAreaHeight(textAreaRef.current);
+  }, [inputValue]);
 
   return (
     <form className=" flex flex-col gap-2 border-b px-4 py-2">
       <div className=" flex gap-4">
         <ProfileImage src={session.data?.user.image || ""} className="" />
         <textarea
+          ref={inputRef}
           style={{ height: 0 }}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -39,6 +44,16 @@ const NewTweetForm = () => {
       <Button className=" self-end ">Twiit</Button>
     </form>
   );
+};
+
+const NewTweetForm = () => {
+  const session = useSession();
+
+  if (session.status !== "authenticated") {
+    return null;
+  }
+
+  return <Form />;
 };
 
 export default NewTweetForm;
